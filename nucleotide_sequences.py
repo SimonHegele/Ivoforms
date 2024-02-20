@@ -14,8 +14,10 @@ class Nucleotide_sequence(ABC):
 
     def to_fasta(self, file, id):
 
-        with open(file, 'a') as fasta:
-            fasta.write(">"+id)
+        if path.getsize(file) == 0:
+                fasta.write(">"+id+"\n")
+            else:
+                fasta.write("\n>"+id+"\n")
             fasta.write(self.sequence)
 
     @abstractmethod
