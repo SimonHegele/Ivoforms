@@ -23,7 +23,7 @@ class Sequencer(ABC):
     def substitution(self, nucleotide_sequence: Nucleotide_sequence, i: int) -> None:
         
         nucleotide = choice([nucleotide for nucleotide in nucleotide_sequence.nucleotides if nucleotide != nucleotide_sequence.sequence[i]])
-        nucleotide_sequence.sequence = nucleotide_sequence.sequence[:i-1] + nucleotide + nucleotide_sequence.sequence[i:]
+        nucleotide_sequence.sequence = nucleotide_sequence.sequence[:i] + nucleotide + nucleotide_sequence.sequence[i+1:]
         
 class Long_read_sequencer(Sequencer):
 
