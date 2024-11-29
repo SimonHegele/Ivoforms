@@ -108,17 +108,17 @@ require an all-versus-all mapping.
 
 Further plans (other than fixing known issues) sorted by priority:
 
-1. Support for assembly graphs in GFA-format
+1. Support for assembly graphs in GFA-format<br>
    (GFA is probably the most used file format for assembly graphs<br>
    and would allow to use a wide variety of tools for the construction<br>
    of the sort read assembly graph)
-2. Improving multithreading
+2. Improving multithreading<br>
    (The user could provide any number of threads to be used for the<br>
    construction of the Minimap2 index while Ivocluster would limit the<br>
    number of threads used for the mapping according to the available RAM<br>
    and the size of the index and the long read file.
-3. Clustering short read data.
-4. Include construction of an actual assembly graph from user provided
+3. Clustering short read data.<br>
+4. Include construction of an actual assembly graph from user provided<br>
    short reads.
 5. Support for different mapping tools or user provided alignment files
 
