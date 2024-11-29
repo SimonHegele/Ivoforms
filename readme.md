@@ -1,63 +1,139 @@
-Ivoforms
+# Ivoforms
 
-A collection of commandline tools for hybrid transcriptome assembly
+A collection of commandline tools for hybrid transcriptome assembly.
     
--------------------------------------------------------------------
+--------------------------------------------------------------------
 
-Ivoforms - Clustering
+## Installation
+
+### Anaconda
+
+**TODO**
+
+### Installing Ivoforms manually
+
+**Requirements**
+
+- Minimap2 (https://github.com/lh3/minimap2)
+- SeqKit (https://github.com/shenwei356/seqkit)
+- Racon (https://github.com/isovic/racon)
+- Python (>=3.6)
+- Numpy
+- Networkx
+
+**TODO**
+
+## 1. Ivocluster
 
 Short read assembly graph guided partitioning of long read data.
 
-The driving idea here is, that components of an assembly graph constructed from short
-reads should each correspond to either a single gene or a group of genes that share parts
-of their sequence. By mapping both long and short reads to the assembly graph we can
-separate them into smaller clusters of reads that can be assembled independently of each
-other.
+The driving idea here is, that components of an assembly graph<br>
+constructed from short reads should each correspond to the isoforms<br>
+of either a single gene or a group of genes that share parts of their<br>
+sequence. By mapping both long reads to the assembly graph they can<br>
+seperated into smaller clusters. This can greatly improve the speed<br>
+of a downstream long read assembly or correction methods that would<br>
+require an all-versus-all mapping.
 
-Overview:
-1.  Assembly graph construction:
-    An assembly graph is constructed from short reads or provided by the user.
-2.  Assembly graph components:
-    Separation of components of the assembly graph
-3.  Mapping
-    Mapping between reads and the components of the assembly graph
-4.  Clustering of the reads:
-    Clustering of reads based on the components they map to.
-    
-In more detail:
-1.  The first step is the construction of an assembly graph.
-    Option a): Providing a precomputed assembly graph (recommended)
-    Assembly graphs in .fastg (from SPAdes) format can be provided.
-    Support for the more common .gfa format will be comming soon.
-    Option b): Computation of a compressed de Bruijn graph (discouraged)
-    This tool can use BCALM to compute a compressed Bruijn graph from provided short reads.
-    I highly recommend to provide a precomputed assembly graph in.fastg format from SPAdes.
-    I will definitely add support for .gfa format since it is the most common format.
-    Alternatively, a compressed de Bruijn graph is computed from the user provided short
-    reads. So far this graph is not edited further.
-    The editing operations that transform a de Bruijn graph to an assembly graph account
-    for sequencing errors and decrease the complexity of the graphs structur. This 
-    increases the of speed of the clustering. 
-2.  The second step is the separation of the assembly graph into it's disconnected
-    components.
-    A .fasta-file containing all unitig sequences is generated. The header of each 
-    sequence will clearly indicate the component it belongs to. 
-3.  Mapping long reads to the contigs of the assembly graph.
-    The split read mapping is facilitated using minimap2.
-    Using minimap2 with only on thread has the great adventage that mappings are reported
-    in the same order as the query sequences which is important for step 4. In order to be
-    able to use several CPU cores at the same time, the reads are divided evenly between
-    several files. Minimap2 is then started for each of them seperately.
-4.  
-5.  The error correction is a self-correction with Racon. In order to take still take 
-    advantage of the higher accuracy in short reads, for each cluster the contigs are
-    spiked in before and extraced after the correction step. 
+### 1.1. Usage
 
-TODO:
-1. Adding .gfa support
-2. Construction of an actual assembly graph
-3. Adding support of different mapping tools or user provided .sam-files
-4. Use seqkit or similar tool for read binning (probably much faster)                     Done
-5. Clustering short read data
-6. Implement cluster
-7. Prevent last read to be lost by the read mapping queue
+**TODO**
+
+### 1.2. Algorithm / Workflow:
+
+1. **Assembly graph construction**
+   Options:
+   a) Provide prcomputed assembly graph from SPAdes in .fastg-format
+   b) Provide short reads and Ivocluster will construct a compressed<br>
+      de Bruijn graph.
+   Using a precomputed assembly graph should be preferred as it is<br>
+   expected to contain less sequenecing artifacts and usually have<br>
+   a less complex structure which makes Ivocluster a lot faster and<br>
+   posibly more accurate.
+2. **Separation of the non connected components of the assembly graph**
+   By parsing the data from the previous step to a networkx.Graph<br>
+   object, it's components can be separated from each other. The contig<br>
+   sequences are written to a new fasta file where the header of each<br>
+   entry shows the index of the corresponding graph component.
+3. **Mapping longreads to the assembly graph**
+   The long reads are mapped to the contigs of the assembly graph<br>
+   using Minimap2.
+   Multithreading:
+   Unfortunately, mapping must be performed using only a single thread<br>
+   in order to guarantee, that mappings are reported in the same order<br>
+   as their corresponding longreads appear in their file.<br>
+   However, multiple threads can be used for the construction of the<br>
+   index. By using SeqKit to split the longreads to smaller files first<br>
+   and mapping each of them separately, multiple threads can be utilized.<br>
+   Since each thread has to load the index of the assembly graph, which<br>
+   is often sevaral gigabytes large. Using many threads will therefore<br>
+   eat your RAM like a bachelor student whose grandma pays for the<br>
+   all-you-can-eat buffet.
+4. **Assigning long reads**
+   The SequenceMappingQueue allows to sequentially iterate through all<br>
+   long reads and their corresponding mappings to the assembly graph.<br>
+   For each longread and it's reported mappings the a greedy heuristic<br>
+   attempts to find a set of longread to contig mappings where the<br>
+   individual mappings do not overlap and have the highest possible combined<br>
+   alignment score.
+   The longread then get assigned to the cluster corresponding to the<br>
+   component of the assembly graph with the best set of non overlapping<br>
+   mappings.<br>
+   Longreads that could not be mapped to the assembly graph are stored<br>
+   in a separate file. Similarly, longreads were different regions map<br>
+   to different components of the assembly graph are also written to
+   a separate file<br>
+   *Why could that happen?*
+   1. Longreads are chimeras, transcript fragments unintentionally fused<br>
+      together.
+   2. Longreads cover transcriptomic regions that have insufficient short<br>
+      read coverage which leads to graph components breaking apart.
+   *What will Ivocluster do in cases like this?*
+    Nothing.<br>
+    Ideally, a statistical analysis would determine which of the two cases<br>
+    applies. For case 1, longreads would be discarded and for case 2 the<br>
+    corresponding read clusters would be merged and the longreads added.<br>
+    I will implement this once this happens.
+
+### Known issues, limitations, and further plans
+
+**Issues**
+- Currently the SequenceMappingQueue loses a single read
+
+**Limitations**
+- Multithreading: Depending on the size of the assembly graph a lot of RAM
+                  is required per thread
+
+**Future plans**
+
+Further plans (other than fixing known issues) sorted by priority:
+
+1. Support for assembly graphs in GFA-format
+   (GFA is probably the most used file format for assembly graphs<br>
+   and would allow to use a wide variety of tools for the construction<br>
+   of the sort read assembly graph)
+2. Improving multithreading
+   (The user could provide any number of threads to be used for the<br>
+   construction of the Minimap2 index while Ivocluster would limit the<br>
+   number of threads used for the mapping according to the available RAM<br>
+   and the size of the index and the long read file.
+3. Clustering short read data.
+4. Include construction of an actual assembly graph from user provided
+   short reads.
+5. Support for different mapping tools or user provided alignment files
+
+## 2. Ivocorrect
+
+"Hybrid self-correction" of clustered longreads with spike-in contigs<br>
+using Minimap2 and Racon.
+
+### 2.1 Usage
+
+### 1.2. Algorithm / Workflow:
+
+1. Spiking longread clusters with the contigs from the corresponding<br>
+   components of short read assembly graph at a user defined rate.
+2. All-versus-all mapping with Minimap2
+3. Self-correction with Racon
+4. Removing spike-in contigs from the files of corrected long-reads.
+                        
