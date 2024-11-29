@@ -129,7 +129,7 @@ using Minimap2 and Racon.
 
 ### 2.1 Usage
 
-### 1.2. Algorithm / Workflow:
+### 2.2. Algorithm / Workflow:
 
 1. Spiking longread clusters with the contigs from the corresponding<br>
    components of short read assembly graph at a user defined rate.
