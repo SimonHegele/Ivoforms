@@ -95,7 +95,7 @@ require an all-versus-all mapping.
     corresponding read clusters would be merged and the longreads added.<br>
     I will implement this once this happens.
 
-### Known issues, limitations, and further plans
+### 1.3 Known issues, limitations, and further plans
 
 **Issues**
 - Currently the SequenceMappingQueue loses a single read
