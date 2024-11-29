@@ -41,9 +41,9 @@ require an all-versus-all mapping.
 
 ### 1.2. Algorithm / Workflow:
 
-1. **Assembly graph construction**
-   Options:
-   a) Provide prcomputed assembly graph from SPAdes in .fastg-format
+1. **Assembly graph construction**<br>
+   Options:<br>
+   a) Provide prcomputed assembly graph from SPAdes in .fastg-format<br>
    b) Provide short reads and Ivocluster will construct a compressed<br>
       de Bruijn graph.
    Using a precomputed assembly graph should be preferred as it is<br>
@@ -57,8 +57,8 @@ require an all-versus-all mapping.
    entry shows the index of the corresponding graph component.
 3. **Mapping longreads to the assembly graph**
    The long reads are mapped to the contigs of the assembly graph<br>
-   using Minimap2.
-   Multithreading:
+   using Minimap2.<br>
+   Multithreading:<br>
    Unfortunately, mapping must be performed using only a single thread<br>
    in order to guarantee, that mappings are reported in the same order<br>
    as their corresponding longreads appear in their file.<br>
@@ -75,7 +75,7 @@ require an all-versus-all mapping.
    For each longread and it's reported mappings the a greedy heuristic<br>
    attempts to find a set of longread to contig mappings where the<br>
    individual mappings do not overlap and have the highest possible combined<br>
-   alignment score.
+   alignment score.<br>
    The longread then get assigned to the cluster corresponding to the<br>
    component of the assembly graph with the best set of non overlapping<br>
    mappings.<br>
