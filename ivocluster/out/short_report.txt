@@ -1,4 +1,0 @@
-# longreads	49995	100%
-# assigned	45868	91.7%
-# unassigned	4127	8.3%
-# cluster	25867
