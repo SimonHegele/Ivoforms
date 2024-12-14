@@ -1,3 +1,5 @@
+# Under construction
+
 # Ivoforms
 
 A collection of commandline tools for hybrid transcriptome assembly.
@@ -98,7 +100,7 @@ require an all-versus-all mapping.
 ### 1.3 Known issues, limitations, and further plans
 
 **Issues**
-- Currently the SequenceMappingQueue loses a single read
+- The mapping strategy
 
 **Limitations**
 - Multithreading: Depending on the size of the assembly graph a lot of RAM
