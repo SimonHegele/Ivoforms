@@ -29,6 +29,8 @@ A collection of commandline tools for hybrid transcriptome assembly.
 
 Short read assembly graph guided partitioning of long read data.
 
+**
+
 The driving idea here is, that components of an assembly graph<br>
 constructed from short reads should each correspond to the isoforms<br>
 of either a single gene or a group of genes that share parts of their<br>
@@ -100,7 +102,9 @@ require an all-versus-all mapping.
 ### 1.3 Known issues, limitations, and further plans
 
 **Issues**
-- The mapping strategy
+
+**It sucks!** (Only ~1/3 of the reads are succesfully assigned to a cluster,
+probably because of the chosen mapping strategy)
 
 **Limitations**
 - Multithreading: Depending on the size of the assembly graph a lot of RAM
